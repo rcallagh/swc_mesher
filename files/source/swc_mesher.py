@@ -14,7 +14,7 @@ bl_info = {
 	"name": "SWC Mesher",
 	"author": "Bob Kuczewski, Oliver Ernst",
 	"version": (1,0,1),
-	"blender": (2,7,7),
+	"blender": (2,80,0),
 	"location": "View 3D > Edit Mode > Tool Shelf",
 	"description": "Generate a Neuron Mesh from an SWC formatted file",
 	"warning" : "",
@@ -27,7 +27,7 @@ class MakeNeuronMeta_Panel(bpy.types.Panel):
 	bl_label = "SWC Mesher"
 
 	bl_space_type = "VIEW_3D"
-	bl_region_type = "TOOLS"
+	bl_region_type = "UI"
 	bl_category = "SWC Mesher"
 
 	@classmethod
@@ -111,10 +111,10 @@ class ExportCableModel_Operator ( bpy.types.Operator , ExportHelper ):
 	bl_idname = "mnm.export_swc"
 	bl_label = "Export Cable Model to SWC file"
 	bl_description = "Generate an SWC file of segments from the skeleton"
-	
-	filepath = bpy.props.StringProperty(subtype='FILE_PATH', default="")
 
-	filename_ext = ".swc" # allowed extensions
+	filepath : bpy.props.StringProperty(subtype='FILE_PATH', default="")
+
+	filename_ext : ".swc" # allowed extensions
 
 	def execute ( self, context ):
 
@@ -241,7 +241,7 @@ class DeleteAllVertexSpheres_Operator( bpy.types.Operator ):
 
 # Class to hold the cable model
 class CableModelObject(bpy.types.PropertyGroup):
-	name = StringProperty ( name="Name", default="", description="Cable Model Name" )
+	name : StringProperty ( name="Name", default="", description="Cable Model Name" )
 
 	# Draw in list of objects
 	def draw_item_in_row ( self, row ):
@@ -261,7 +261,7 @@ class CableModelAdd(bpy.types.Operator):
 	bl_label = "Add Cable Model"
 	bl_description = "Add a cable model to edit"
 	bl_options = {'REGISTER', 'UNDO'}
-	
+
 	def execute(self, context):
 		context.scene.make_neuron_meta.cable_model_add_func(context)
 		return {'FINISHED'}
@@ -272,7 +272,7 @@ class CableModelRemove(bpy.types.Operator):
 	bl_label = "Remove Cable Model"
 	bl_description = "Remove a cable model"
 	bl_options = {'REGISTER', 'UNDO'}
-	
+
 	def execute(self, context):
 		context.scene.make_neuron_meta.cable_model_remove_func(context)
 		return {'FINISHED'}
@@ -283,7 +283,7 @@ class CableModelRemoveAll(bpy.types.Operator):
 	bl_label = "Remove all Cable Models"
 	bl_description = "Remove all cable models"
 	bl_options = {'REGISTER', 'UNDO'}
-	
+
 	def execute(self, context):
 		context.scene.make_neuron_meta.cable_model_remove_all_func(context)
 		return {'FINISHED'}
@@ -369,37 +369,37 @@ def file_name_change ( self, context ):
 
 class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 	# frames_dir = StringProperty(name="frames_dir", default="")
-	neuron_file_name = StringProperty ( subtype='FILE_PATH', default="", update=file_name_change)
-	neuron_file_data = StringProperty ( default="" )
+	neuron_file_name : StringProperty ( subtype='FILE_PATH', default="", update=file_name_change)
+	neuron_file_data : StringProperty ( default="" )
 
-	convert_to_mesh = BoolProperty ( name="Convert to Mesh", default=False )
-	show_analysis = BoolProperty ( default=False )
-	show_stick    = BoolProperty ( default=False )
-	file_analyzed = BoolProperty ( default=False )
-	num_lines_in_file = IntProperty ( default=-1 )
-	num_segments_in_file = IntProperty ( default=-1 )
-	num_nodes_in_file = IntProperty ( default=-1 )
-	largest_radius_in_file = FloatProperty ( default=-1 )
-	smallest_radius_in_file = FloatProperty ( default=-1 )
-	min_x = FloatProperty ( default=-1 )
-	max_x = FloatProperty ( default=-1 )
-	min_y = FloatProperty ( default=-1 )
-	max_y = FloatProperty ( default=-1 )
-	min_z = FloatProperty ( default=-1 )
-	max_z = FloatProperty ( default=-1 )
-	
-	scale_file_data = FloatProperty ( default=1.0, precision=4, description="Scale factor applied to data read from a file" )
-	meta_ball_scale_factor = FloatProperty ( default=1.0, precision=4, description="Scale factor applied to mesh radius" )
+	convert_to_mesh : BoolProperty ( name="Convert to Mesh", default=False )
+	show_analysis : BoolProperty ( default=False )
+	show_stick    : BoolProperty ( default=False )
+	file_analyzed : BoolProperty ( default=False )
+	num_lines_in_file : IntProperty ( default=-1 )
+	num_segments_in_file : IntProperty ( default=-1 )
+	num_nodes_in_file : IntProperty ( default=-1 )
+	largest_radius_in_file : FloatProperty ( default=-1 )
+	smallest_radius_in_file : FloatProperty ( default=-1 )
+	min_x : FloatProperty ( default=-1 )
+	max_x : FloatProperty ( default=-1 )
+	min_y : FloatProperty ( default=-1 )
+	max_y : FloatProperty ( default=-1 )
+	min_z : FloatProperty ( default=-1 )
+	max_z : FloatProperty ( default=-1 )
 
-	mesh_resolution = FloatProperty ( default=0.1, precision=4, description="Intended resolution of the final mesh" )
-	min_forced_radius = FloatProperty ( default=0.0, precision=4, description="Smallest radius allowed in all segments (smaller forced up to this radius)" )
-	num_segs_limit = IntProperty ( default=0, description="Only generate this number of segments (useful for testing settings in large neurons)" )
+	scale_file_data : FloatProperty ( default=1.0, precision=4, description="Scale factor applied to data read from a file" )
+	meta_ball_scale_factor : FloatProperty ( default=1.0, precision=4, description="Scale factor applied to mesh radius" )
 
-	new_sphere_radius = FloatProperty ( default=1, description="Radius of new vertex spheres" )
+	mesh_resolution : FloatProperty ( default=0.1, precision=4, description="Intended resolution of the final mesh" )
+	min_forced_radius : FloatProperty ( default=0.0, precision=4, description="Smallest radius allowed in all segments (smaller forced up to this radius)" )
+	num_segs_limit : IntProperty ( default=0, description="Only generate this number of segments (useful for testing settings in large neurons)" )
+
+	new_sphere_radius : FloatProperty ( default=1, description="Radius of new vertex spheres" )
 
 	# List of Cable Models
-	cable_model_list = CollectionProperty(type=CableModelObject, name="Cable Model List")
-	active_object_index = IntProperty(name="Active Object Index", default=0)
+	cable_model_list : bpy.props.CollectionProperty(type=CableModelObject, name="Cable Model List")
+	active_object_index : IntProperty(name="Active Object Index", default=0)
 
 	def draw ( self, layout ):
 
@@ -473,12 +473,12 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 
 			row = box.row()
 			col = row.column()
-		
+
 			col.template_list("SWCMesher_UL_object", "",
 							  self, "cable_model_list",
 							  self, "active_object_index",
 							  rows=1)
-			
+
 			col = row.column(align=True)
 			col.operator("mnm.cable_model_add", icon='ZOOMIN', text="")
 			col.operator("mnm.cable_model_remove", icon='ZOOMOUT', text="")
@@ -817,17 +817,17 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			idx = int(index_number_layer.data[i_v].value)
 
 			# Make a sphere
-			bpy.ops.mesh.primitive_uv_sphere_add(segments=16, 
-				ring_count=8, 
-				size=r, 
-				enter_editmode=False, 
+			bpy.ops.mesh.primitive_uv_sphere_add(segments=16,
+				ring_count=8,
+				size=r,
+				enter_editmode=False,
 				location=tuple(mat*loc))
 
 			# Get the new object
 			new_ob = context.active_object
 
 			# Rename it appropriately
-			new_ob.name = (ob_name+ "_vertex_" + v_name) % idx 
+			new_ob.name = (ob_name+ "_vertex_" + v_name) % idx
 
 
 	# Update the cable model based on the sphere locations
@@ -995,7 +995,7 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 	def read_segments_from_object ( self, context ):
 		# Read in the data
 		segments = []
-		
+
 		# Read from the selected cable model in the list
 
 		# Try to get the object
@@ -1091,7 +1091,7 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 	def read_segments_from_file ( self ):
 		# Read in the data
 		segments = []
-		
+
 		print ( "Reading from file " + self.neuron_file_name )
 
 		self.num_nodes_in_file = 0
@@ -1130,19 +1130,19 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			# Read SWC Format
 			# SWC format has explicit connections, but they're not needed with metaballs
 			"""
-			The format of an SWC file is fairly simple. It is a text file consisting of 
-			a header with various fields beginning with a # character, 
-			and a series of three dimensional points containing 
-			an index, radius, type, and connectivity information. 
+			The format of an SWC file is fairly simple. It is a text file consisting of
+			a header with various fields beginning with a # character,
+			and a series of three dimensional points containing
+			an index, radius, type, and connectivity information.
 			The lines in the text file representing points have the following layout.
 
 						n T x y z R P
 
-						n is an integer label that identifies the current point and 
+						n is an integer label that identifies the current point and
 								increments by one from one line to the next.
 
-						T is an integer representing the type of neuronal segment, 
-								such as soma, axon, apical dendrite, etc. The standard 
+						T is an integer representing the type of neuronal segment,
+								such as soma, axon, apical dendrite, etc. The standard
 								accepted integer values are given below.
 
 								0 = undefined
@@ -1157,13 +1157,13 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 						x, y, z gives the cartesian coordinates of each node.
 
 						R is the radius at that node.
-						P indicates the parent (the integer label) of the current 
+						P indicates the parent (the integer label) of the current
 								point or -1 to indicate an origin (soma).
 			"""
 			# Note that the SWC format could define cyclic references,
 			#   However, since we just need to generate segments, this is not a problem.
 			#   This is done by making each segment only one line (from parent to child)
-			
+
 			# Start by reading all the points into a dictionary keyed by their label n
 
 			f = open ( self.neuron_file_name, 'r' )
@@ -1325,7 +1325,7 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 
 		# Get the matrix world
 		mat = ob.matrix_world
-		
+
 		# Get the data stored on the vertices
 		radius_layer = ob.data.vertex_layers_float["radius"]
 		index_number_layer = ob.data.vertex_layers_float["index_number"]
@@ -1335,7 +1335,7 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 		# Index values
 		n_idx = len(vs)
 		id_value_list = [int(index_number_layer.data[i].value) for i in range(0,n_idx)]
-		
+
 		# Write all vertices
 		idx = 1
 		while idx < len(id_value_list)+1:
@@ -1473,7 +1473,7 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			# Add to the list
 			self.cable_model_add_func(context)
 
-	
+
 	def build_neuron_meta_from_segments ( self, context, segments ):
 
 		# segments = self.read_segments_from_file()
@@ -1543,7 +1543,7 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 						ele = mball.elements.new()
 						ele.radius = r * self.meta_ball_scale_factor
 						ele.co = (x, y, z)
-						
+
 						# Move x, y, z, and r to the next point
 						length_so_far += r/2
 						r = r1 + (length_so_far * dr / segment_length)
@@ -1566,13 +1566,37 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 		obj.select = True
 
 
-def register():
-  bpy.utils.register_module(__name__)
-  bpy.types.Scene.make_neuron_meta = bpy.props.PointerProperty(type=MakeNeuronMetaPropGroup)
+classes = (
+	MakeNeuronMetaAnalyze_Operator,
+	MakeNeuronMeta_Operator,
+	# MakeNeuronMeta_Operator,
+	CableModelRemoveAll,
+	CableModelRemove,
+	CableModelAdd,
+	SWCMesher_UL_object,
+	CableModelObject,
+	DeleteAllVertexSpheres_Operator,
+	HideVertexSpheres_Operator,
+	ShowVertexSpheres_Operator,
+	UpdateCableFromSpheres_Operator,
+	MakeSpheres_Operator,
+	ExportCableModel_Operator,
+	UpdateCablePostEdit_Operator,
+	MakeEmptyStick_Operator,
+	MakeNeuronStick_Operator,
+	MakeNeuronMeta_Panel,
+	MakeNeuronMetaPropGroup
+	)
 
+register, unregister = bpy.utils.register_classes_factory(classes);
 
-def unregister():
-  bpy.utils.unregister_module(__name__)
+# def register():
+#   bpy.utils.register_module(__name__)
+#   bpy.types.Scene.make_neuron_meta = bpy.props.PointerProperty(type=MakeNeuronMetaPropGroup)
+#
+#
+# def unregister():
+#   bpy.utils.unregister_module(__name__)
 
 
 if __name__ == "__main__":
