@@ -14,7 +14,7 @@ bl_info = {
 	"name": "SWC Mesher",
 	"author": "Bob Kuczewski, Oliver Ernst",
 	"version": (1,0,1),
-	"blender": (2,7,7),
+	"blender": (2,80,0),
 	"location": "View 3D > Edit Mode > Tool Shelf",
 	"description": "Generate a Neuron Mesh from an SWC formatted file",
 	"warning" : "",
