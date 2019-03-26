@@ -820,9 +820,9 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			# Make a sphere
 			bpy.ops.mesh.primitive_uv_sphere_add(segments=16,
 				ring_count=8,
-				size=r,
+				radius=r,
 				enter_editmode=False,
-				location=tuple(mat*loc))
+				location=tuple(mat @ loc))
 
 			# Get the new object
 			new_ob = context.active_object
@@ -873,7 +873,7 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			r = sum([0.5*dim[i] for i in [0,1,2]]) / 3.0
 
 			# Store
-			new_pos_dict[i_v] = mat_inv * ob_sphere.location
+			new_pos_dict[i_v] = mat_inv @ ob_sphere.location
 			new_r_dict[i_v] = r
 
 		# Update the vertex data on the cable model
@@ -964,10 +964,10 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 		# Current selection, and ensure everything is DE-selected
 		ob_sel_list = []
 		for ob_select in bpy.data.objects:
-			if ob_select.select == True:
+			if ob_select.select_get() == True:
 				ob_sel_list.append(ob_select.name)
 				# Deselect the object
-				ob_select.select = False
+				ob_select.select_set(False)
 
 		# Go through all objects and delete
 		lo = len(ob_name)
@@ -1341,7 +1341,7 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 		idx = 1
 		while idx < len(id_value_list)+1:
 			i_v = id_value_list.index(idx)
-			co = mat * vs[i_v].co
+			co = mat @ vs[i_v].co
 			radius_from_layer = radius_layer.data[i_v].value
 			if radius_from_layer < 0:
 			  radius_from_layer = self.new_sphere_radius
@@ -1589,7 +1589,7 @@ classes = (
 	MNM_PT_MakeNeuronMetaPropGroup
 	)
 
-# register, unregister = bpy.utils.register_classes_factory(classes);
+
 def register():
 	from bpy.utils import register_class
 	for cls in classes:
@@ -1602,13 +1602,6 @@ def unregister():
 	for cls in reversed(classes):
 		unregister_class(cls)
 
-# def register():
-#   bpy.utils.register_module(__name__)
-#   bpy.types.Scene.make_neuron_meta = bpy.props.PointerProperty(type=MakeNeuronMetaPropGroup)
-#
-#
-# def unregister():
-#   bpy.utils.unregister_module(__name__)
 
 
 if __name__ == "__main__":
