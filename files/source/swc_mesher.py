@@ -23,7 +23,8 @@ bl_info = {
 	"category": "Add Mesh",
 }
 
-class MakeNeuronMeta_Panel(bpy.types.Panel):
+# class MakeNeuronMeta_Panel(bpy.types.Panel):
+class MNM_PT_MakeNeuronMeta_Panel(bpy.types.Panel):
 	bl_label = "SWC Mesher"
 
 	bl_space_type = "VIEW_3D"
@@ -38,7 +39,7 @@ class MakeNeuronMeta_Panel(bpy.types.Panel):
 		mnm = context.scene.make_neuron_meta
 		mnm.draw ( self.layout )
 
-class MakeNeuronStick_Operator ( bpy.types.Operator ):
+class MNM_OT_MakeNeuronStick_Operator (bpy.types.Operator):
 	bl_idname = "mnm.make_line_mesh"
 	bl_label = "Make Cable Model from File"
 	bl_description = "Generate a skeleton of line segments from the SWC file directly"
@@ -55,7 +56,7 @@ class MakeNeuronStick_Operator ( bpy.types.Operator ):
 		context.scene.make_neuron_meta.build_neuron_stick_from_file ( context )
 		return {"FINISHED"}
 
-class MakeEmptyStick_Operator(bpy.types.Operator):
+class MNM_OT_MakeEmptyStick_Operator(bpy.types.Operator):
 	bl_idname = "mnm.make_new_cable"
 	bl_label = "Make New Cable Model"
 	bl_description = "Make a new cable model from scratch"
@@ -81,7 +82,7 @@ class MakeEmptyStick_Operator(bpy.types.Operator):
 
 
 # Class to update the cable model post editing it
-class UpdateCablePostEdit_Operator( bpy.types.Operator ):
+class MNM_OT_UpdateCablePostEdit_Operator( bpy.types.Operator ):
 	bl_idname = "mnm.update_cable_from_cable"
 	bl_label = "Update Cable Model from Geometry"
 	bl_description = "Update the internal cable model from the current geometry"
@@ -107,7 +108,7 @@ class UpdateCablePostEdit_Operator( bpy.types.Operator ):
 
 
 # Export a cable model to SWC file
-class ExportCableModel_Operator ( bpy.types.Operator , ExportHelper ):
+class MNM_OT_ExportCableModel_Operator ( bpy.types.Operator , ExportHelper ):
 	bl_idname = "mnm.export_swc"
 	bl_label = "Export Cable Model to SWC file"
 	bl_description = "Generate an SWC file of segments from the skeleton"
@@ -119,7 +120,7 @@ class ExportCableModel_Operator ( bpy.types.Operator , ExportHelper ):
 	def execute ( self, context ):
 
 		# Check that an object is selected
-		if context.scene.objects.active == None:
+		if context.view_layer.objects.active == None:
 			raise TypeError("Please select the cable model to export.")
 
 		# Export the SWC file
@@ -141,7 +142,7 @@ class ExportCableModel_Operator ( bpy.types.Operator , ExportHelper ):
 
 
 # Class to make spheres
-class MakeSpheres_Operator( bpy.types.Operator ):
+class MNM_OT_MakeSpheres_Operator( bpy.types.Operator ):
 	bl_idname = "mnm.make_spheres"
 	bl_label = "Make Spheres for each Vertex"
 	bl_description = "Generate a sphere at each vertex of the cable model"
@@ -159,7 +160,7 @@ class MakeSpheres_Operator( bpy.types.Operator ):
 		return {"FINISHED"}
 
 # Class to update the cable model from the sphere locations/radii
-class UpdateCableFromSpheres_Operator( bpy.types.Operator ):
+class MNM_OT_UpdateCableFromSpheres_Operator( bpy.types.Operator ):
 	bl_idname = "mnm.update_cable_from_spheres"
 	bl_label = "Update Cable Model from Spheres"
 	bl_description = "Update the cable model from sphere locations/radii"
@@ -177,7 +178,7 @@ class UpdateCableFromSpheres_Operator( bpy.types.Operator ):
 		return {"FINISHED"}
 
 # Class to show all vertex spheres
-class ShowVertexSpheres_Operator( bpy.types.Operator ):
+class MNM_OT_ShowVertexSpheres_Operator( bpy.types.Operator ):
 	bl_idname = "mnm.show_spheres"
 	bl_label = "Show"
 	bl_description = "Show all vertex spheres"
@@ -195,7 +196,7 @@ class ShowVertexSpheres_Operator( bpy.types.Operator ):
 		return {"FINISHED"}
 
 # Class to hide all vertex spheres
-class HideVertexSpheres_Operator( bpy.types.Operator ):
+class MNM_OT_HideVertexSpheres_Operator( bpy.types.Operator ):
 	bl_idname = "mnm.hide_spheres"
 	bl_label = "Hide"
 	bl_description = "Hide all vertex spheres"
@@ -213,7 +214,7 @@ class HideVertexSpheres_Operator( bpy.types.Operator ):
 		return {"FINISHED"}
 
 # Class to show all vertex spheres
-class DeleteAllVertexSpheres_Operator( bpy.types.Operator ):
+class MNM_OT_DeleteAllVertexSpheres_Operator( bpy.types.Operator ):
 	bl_idname = "mnm.delete_all_spheres"
 	bl_label = "Delete All"
 	bl_description = "Delete all vertex spheres"
@@ -240,7 +241,7 @@ class DeleteAllVertexSpheres_Operator( bpy.types.Operator ):
 #######################################################
 
 # Class to hold the cable model
-class CableModelObject(bpy.types.PropertyGroup):
+class MNM_PT_CableModelObject(bpy.types.PropertyGroup):
 	name : StringProperty ( name="Name", default="", description="Cable Model Name" )
 
 	# Draw in list of objects
@@ -249,14 +250,14 @@ class CableModelObject(bpy.types.PropertyGroup):
 		col.label ( str(self.name) )
 
 # Cable model object item to draw in the list
-class SWCMesher_UL_object(bpy.types.UIList):
+class MNM_UL_SWCMesher_UL_object(bpy.types.UIList):
 	def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
 		# The item will be a CableModelObject
 		# Let it draw itself in a new row:
 		item.draw_item_in_row ( layout.row() )
 
 # Button to add cable model
-class CableModelAdd(bpy.types.Operator):
+class MNM_OT_CableModelAdd(bpy.types.Operator):
 	bl_idname = "mnm.cable_model_add"
 	bl_label = "Add Cable Model"
 	bl_description = "Add a cable model to edit"
@@ -267,7 +268,7 @@ class CableModelAdd(bpy.types.Operator):
 		return {'FINISHED'}
 
 # Button to remove cable model
-class CableModelRemove(bpy.types.Operator):
+class MNM_OT_CableModelRemove(bpy.types.Operator):
 	bl_idname = "mnm.cable_model_remove"
 	bl_label = "Remove Cable Model"
 	bl_description = "Remove a cable model"
@@ -278,7 +279,7 @@ class CableModelRemove(bpy.types.Operator):
 		return {'FINISHED'}
 
 # Button to remove all cable models
-class CableModelRemoveAll(bpy.types.Operator):
+class MNM_OT_CableModelRemoveAll(bpy.types.Operator):
 	bl_idname = "mnm.cable_model_remove_all"
 	bl_label = "Remove all Cable Models"
 	bl_description = "Remove all cable models"
@@ -296,7 +297,7 @@ class CableModelRemoveAll(bpy.types.Operator):
 #######################################################
 
 
-class MakeNeuronMeta_Operator ( bpy.types.Operator ):
+class MNM_OT_MakeNeuronMeta_Operator_file ( bpy.types.Operator ):
 	bl_idname = "mnm.make_neuron_from_file"
 	bl_label = "Make Surface Mesh from File"
 	bl_description = "Generate a surface mesh from the SWC file"
@@ -317,7 +318,7 @@ class MakeNeuronMeta_Operator ( bpy.types.Operator ):
 		mnm.build_neuron_meta_from_segments ( context, segments )
 		return {"FINISHED"}
 
-class MakeNeuronMeta_Operator ( bpy.types.Operator ):
+class MNM_OT_MakeNeuronMeta_Operator ( bpy.types.Operator ):
 	bl_idname = "mnm.make_neuron_from_data"
 	bl_label = "Make Surface Mesh from Cable Model"
 	bl_description = "Generate a surface mesh from the current skeleton"
@@ -338,7 +339,7 @@ class MakeNeuronMeta_Operator ( bpy.types.Operator ):
 		mnm.build_neuron_meta_from_segments ( context, segments )
 		return {"FINISHED"}
 
-class MakeNeuronMetaAnalyze_Operator ( bpy.types.Operator ):
+class MNM_OT_MakeNeuronMetaAnalyze_Operator ( bpy.types.Operator ):
 	bl_idname = "mnm.analyze_file"
 	bl_label = "Analyze File"
 	bl_description = "Read the file to determine numbers of segments, nodes, and various size ranges"
@@ -367,7 +368,7 @@ def file_name_change ( self, context ):
 #######################################################
 
 
-class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
+class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 	# frames_dir = StringProperty(name="frames_dir", default="")
 	neuron_file_name : StringProperty ( subtype='FILE_PATH', default="", update=file_name_change)
 	neuron_file_data : StringProperty ( default="" )
@@ -398,7 +399,7 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 	new_sphere_radius : FloatProperty ( default=1, description="Radius of new vertex spheres" )
 
 	# List of Cable Models
-	cable_model_list : bpy.props.CollectionProperty(type=CableModelObject, name="Cable Model List")
+	cable_model_list : bpy.props.CollectionProperty(type=MNM_PT_CableModelObject, name="Cable Model List")
 	active_object_index : IntProperty(name="Active Object Index", default=0)
 
 	def draw ( self, layout ):
@@ -432,21 +433,21 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 				row = box.row()
 				box = row.box()
 				row = box.row()
-				row.label ( "File contains " + str(self.num_lines_in_file) + " lines." )
+				row.label ( text = "File contains " + str(self.num_lines_in_file) + " lines." )
 				row = box.row()
-				row.label ( "File contains " + str(self.num_segments_in_file) + " segments." )
+				row.label ( text = "File contains " + str(self.num_segments_in_file) + " segments." )
 				row = box.row()
-				row.label ( "File contains " + str(self.num_nodes_in_file) + " nodes." )
+				row.label ( text = "File contains " + str(self.num_nodes_in_file) + " nodes." )
 				row = box.row()
-				row.label ( "Largest radius is %g" % self.largest_radius_in_file )
+				row.label ( text = "Largest radius is %g" % self.largest_radius_in_file )
 				row = box.row()
-				row.label ( "Smallest radius is %g" % self.smallest_radius_in_file )
+				row.label ( text = "Smallest radius is %g" % self.smallest_radius_in_file )
 				row = box.row()
-				row.label ( "X range: %g to %g" % (self.min_x, self.max_x) )
+				row.label ( text = "X range: %g to %g" % (self.min_x, self.max_x) )
 				row = box.row()
-				row.label ( "Y range: %g to %g" % (self.min_y, self.max_y) )
+				row.label ( text = "Y range: %g to %g" % (self.min_y, self.max_y) )
 				row = box.row()
-				row.label ( "Z range: %g to %g" % (self.min_z, self.max_z) )
+				row.label ( text = "Z range: %g to %g" % (self.min_z, self.max_z) )
 
 		box = layout.box()
 		row = box.row(align=True)
@@ -466,7 +467,7 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			###
 
 			row = box.row()
-			row.label("List of Cable Models", icon='CURVE_DATA')
+			row.label(text = "List of Cable Models", icon='CURVE_DATA')
 
 			row = box.row()
 			row.operator("mnm.make_new_cable")
@@ -474,14 +475,14 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			row = box.row()
 			col = row.column()
 
-			col.template_list("SWCMesher_UL_object", "",
+			col.template_list("MNM_UL_SWCMesher_UL_object", "",
 							  self, "cable_model_list",
 							  self, "active_object_index",
 							  rows=1)
 
 			col = row.column(align=True)
-			col.operator("mnm.cable_model_add", icon='ZOOMIN', text="")
-			col.operator("mnm.cable_model_remove", icon='ZOOMOUT', text="")
+			col.operator("mnm.cable_model_add", icon='ADD', text="")
+			col.operator("mnm.cable_model_remove", icon='REMOVE', text="")
 			col.operator("mnm.cable_model_remove_all", icon='X', text="")
 
 			###
@@ -489,7 +490,7 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			###
 
 			row = box.row()
-			row.label("Edit Selected Cable Model", icon='GREASEPENCIL')
+			row.label(text = "Edit Selected Cable Model", icon='GREASEPENCIL')
 
 			row = box.row()
 			subbox = row.box()
@@ -498,7 +499,7 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 
 			split = subbox.split()
 			col = split.column(align=True)
-			col.label("After editing the geometry:")
+			col.label(text = "After editing the geometry:")
 			col.operator( "mnm.update_cable_from_cable" )
 
 			# Make spheres
@@ -506,7 +507,7 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			row = subbox.row()
 			split = subbox.split()
 			col = split.column(align=True)
-			col.label("To edit the radii:")
+			col.label(text = "To edit the radii:")
 			subrow = col.row()
 			subrow.operator ( "mnm.make_spheres" )
 			subrow.prop ( self, "new_sphere_radius", text="New Sphere Radius" )
@@ -514,7 +515,7 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			rw.operator("mnm.show_spheres")
 			rw.operator("mnm.hide_spheres")
 			rw.operator("mnm.delete_all_spheres")
-			col.label("After editing the radii:")
+			col.label(text = "After editing the radii:")
 			col.operator ( "mnm.update_cable_from_spheres" )
 
 			row = box.row()
@@ -525,7 +526,7 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			###
 
 			row = box.row()
-			row.label("Extrapolate Surface Mesh", icon='SURFACE_NCYLINDER')
+			row.label(text = "Extrapolate Surface Mesh", icon='SURFACE_NCYLINDER')
 
 			row = box.row()
 			subbox = row.box()
@@ -569,7 +570,7 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 		new_mesh.from_pydata ( vs, ls, [] )
 		new_mesh.update()
 		new_obj = bpy.data.objects.new ( "cable_model_mesh", new_mesh )
-		context.scene.objects.link ( new_obj )
+		context.scene.collection.objects.link ( new_obj )
 
 		# Add metadata
 		mesh = new_obj.data
@@ -600,8 +601,8 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 		bpy.ops.object.select_all(action='DESELECT')
 
 		# Select the new obj and make it active
-		new_obj.select = True
-		context.scene.objects.active = new_obj
+		new_obj.select_set(True)
+		context.view_layer.objects.active = new_obj
 
 		# Add to the list
 		self.cable_model_add_func(context)
@@ -929,7 +930,7 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 		lo = len(ob_name)
 		for ob_vertex in bpy.data.objects:
 			if len(ob_vertex.name) >= 7+lo and ob_vertex.name[0:(7+lo)] == ob_name + "_vertex":
-				ob_vertex.hide = flag
+				ob_vertex.hide_viewport = flag
 
 
 	# Delete all vertex spheres
@@ -944,18 +945,18 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 		ob = bpy.data.objects[ob_name]
 
 		# Ensure there is (any) current active object
-		ob_active = context.scene.objects.active
+		ob_active = context.view_layer.objects.active
 		print(ob_active)
 		if ob_active == None:
 			# Set the active object to the any
 			vals = bpy.data.objects.values()
-			context.scene.objects.active = vals[0]
-			vals[0].hide = False
-			vals[0].select = True
+			context.view_layer.objects.active = vals[0]
+			vals[0].hide_viewport = False
+			vals[0].select_set(True)
 		else:
 			# Ensure it is also visible and selected
-			ob_active.hide = False
-			ob_active.select = True
+			ob_active.hide_viewport = False
+			ob_active.select_set(True)
 
 		# Ensure object mode
 		bpy.ops.object.mode_set(mode='OBJECT')
@@ -972,14 +973,14 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 		lo = len(ob_name)
 		for ob_delete in bpy.data.objects:
 			if len(ob_delete.name) >= 7+lo and ob_delete.name[0:(7+lo)] == ob_name + "_vertex":
-				ob_delete.hide = False
-				ob_delete.select = True
+				ob_delete.hide_viewport = False
+				ob_delete.select_set(True)
 				bpy.ops.object.delete()
 
 		# Reselect
 		for ob_select in bpy.data.objects:
 			if ob_select.name in ob_sel_list:
-				ob_select.select = True
+				ob_select.select_set(True)
 
 
 	###
@@ -1007,8 +1008,8 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 		obj = bpy.data.objects[obj_name]
 
 		# Make sure it's active and selected
-		context.scene.objects.active = obj
-		obj.select = True
+		context.view_layer.objects.active = obj
+		obj.select_set(True)
 
 		mesh = obj.data
 		verts = mesh.vertices
@@ -1417,7 +1418,7 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			new_mesh.from_pydata ( verts, lines, [] )
 			new_mesh.update()
 			new_obj = bpy.data.objects.new ( swc_fname + "_cable_model", new_mesh )
-			context.scene.objects.link ( new_obj )
+			context.scene.collection.objects.link ( new_obj )
 
 			'''
 			# All points
@@ -1467,8 +1468,8 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			bpy.ops.object.select_all(action='DESELECT')
 
 			# Select the new obj and make it active
-			new_obj.select = True
-			context.scene.objects.active = new_obj
+			new_obj.select_set(True)
+			context.view_layer.objects.active = new_obj
 
 			# Add to the list
 			self.cable_model_add_func(context)
@@ -1483,7 +1484,7 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 		scene = bpy.context.scene
 		mball = bpy.data.metaballs.new('neuron')
 		obj = bpy.data.objects.new('Neuron',mball)
-		scene.objects.link(obj)
+		scene.collection.objects.link(obj)
 		mball.resolution = self.mesh_resolution
 		mball.render_resolution = self.mesh_resolution
 
@@ -1563,32 +1564,43 @@ class MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 		if self.convert_to_mesh:
 			bpy.ops.object.convert()
 
-		obj.select = True
+		obj.select_set(True)
 
 
 classes = (
-	MakeNeuronMetaAnalyze_Operator,
-	MakeNeuronMeta_Operator,
-	# MakeNeuronMeta_Operator,
-	CableModelRemoveAll,
-	CableModelRemove,
-	CableModelAdd,
-	SWCMesher_UL_object,
-	CableModelObject,
-	DeleteAllVertexSpheres_Operator,
-	HideVertexSpheres_Operator,
-	ShowVertexSpheres_Operator,
-	UpdateCableFromSpheres_Operator,
-	MakeSpheres_Operator,
-	ExportCableModel_Operator,
-	UpdateCablePostEdit_Operator,
-	MakeEmptyStick_Operator,
-	MakeNeuronStick_Operator,
-	MakeNeuronMeta_Panel,
-	MakeNeuronMetaPropGroup
+	MNM_PT_MakeNeuronMeta_Panel,
+	MNM_OT_MakeNeuronStick_Operator,
+	MNM_OT_MakeEmptyStick_Operator,
+	MNM_OT_UpdateCablePostEdit_Operator,
+	MNM_OT_ExportCableModel_Operator,
+	MNM_OT_MakeSpheres_Operator,
+	MNM_OT_UpdateCableFromSpheres_Operator,
+	MNM_OT_ShowVertexSpheres_Operator,
+	MNM_OT_HideVertexSpheres_Operator,
+	MNM_OT_DeleteAllVertexSpheres_Operator,
+	MNM_PT_CableModelObject,
+	MNM_UL_SWCMesher_UL_object,
+	MNM_OT_CableModelAdd,
+	MNM_OT_CableModelRemove,
+	MNM_OT_CableModelRemoveAll,
+	MNM_OT_MakeNeuronMeta_Operator_file,
+	MNM_OT_MakeNeuronMeta_Operator,
+	MNM_OT_MakeNeuronMetaAnalyze_Operator,
+	MNM_PT_MakeNeuronMetaPropGroup
 	)
 
-register, unregister = bpy.utils.register_classes_factory(classes);
+# register, unregister = bpy.utils.register_classes_factory(classes);
+def register():
+	from bpy.utils import register_class
+	for cls in classes:
+		register_class(cls)
+
+	bpy.types.Scene.make_neuron_meta = bpy.props.PointerProperty(type=MNM_PT_MakeNeuronMetaPropGroup)
+
+def unregister():
+	from bpy.utils import unregister_class
+	for cls in reversed(classes):
+		unregister_class(cls)
 
 # def register():
 #   bpy.utils.register_module(__name__)
