@@ -12,10 +12,10 @@ from os.path import basename
 
 bl_info = {
 	"name": "SWC Mesher",
-	"author": "Bob Kuczewski, Oliver Ernst",
-	"version": (1,0,1),
+	"author": "Bob Kuczewski, Oliver Ernst, Ross Callaghan",
+	"version": (1,0,2),
 	"blender": (2,80,0),
-	"location": "View 3D > Edit Mode > Tool Shelf",
+	"location": "View 3D > Properties",
 	"description": "Generate a Neuron Mesh from an SWC formatted file",
 	"warning" : "",
 	"wiki_url" : "http://salk.edu",
