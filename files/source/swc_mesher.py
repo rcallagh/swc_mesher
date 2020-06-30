@@ -372,7 +372,7 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 	# frames_dir = StringProperty(name="frames_dir", default="")
 	neuron_file_name : StringProperty ( subtype='FILE_PATH', default="", update=file_name_change)
 	neuron_file_data : StringProperty ( default="" )
-
+	verbose = BoolProperty( default=False )
 	convert_to_mesh : BoolProperty ( name="Convert to Mesh", default=False )
 	show_analysis : BoolProperty ( default=False )
 	show_stick    : BoolProperty ( default=False )
@@ -615,7 +615,8 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 
 	# Add a cable model to the list
 	def cable_model_add_func(self, context):
-		print("Adding cable model to the list")
+		if self.verbose:
+			print("Adding cable model to the list")
 
 		# Get the active object
 		obj_list = context.selected_objects
@@ -635,7 +636,8 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 
 	# Remove a cable model
 	def cable_model_remove_func(self, context):
-		print("Removing cable model from the list")
+		if self.verbose:
+			print("Removing cable model from the list")
 
 		self.cable_model_list.remove ( self.active_object_index )
 		if self.active_object_index > 0:
@@ -643,7 +645,8 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 
 	# Remove all cable models
 	def cable_model_remove_all_func(self, context):
-		print("Removing all cable models")
+		if self.verbose:
+			print("Removing all cable models")
 
 		while len(self.cable_model_list) > 0:
 			self.cable_model_list.remove ( 0 )
@@ -682,7 +685,8 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 	# Update cable model post extrusion/deletion
 	def update_cable_model_post_edit( self, context ):
 
-		print("Updating cable model post editing.")
+		if self.verbose:
+			print("Updating cable model post editing.")
 
 		# Try to get the object
 		if not len(self.cable_model_list) > 0:
@@ -907,7 +911,8 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 		# Write things
 		file_lines = self.get_swc_from_mesh_stick ( context )
 		if file_lines == None:
-			print ( "Unable to save file" )
+			if self.verbose:
+				print ( "Unable to save file" )
 		else:
 			f = open(fpath, "w")
 			for l in file_lines:
@@ -946,7 +951,8 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 
 		# Ensure there is (any) current active object
 		ob_active = context.view_layer.objects.active
-		print(ob_active)
+		if self.verbose:
+			print(ob_active)
 		if ob_active == None:
 			# Set the active object to the any
 			vals = bpy.data.objects.values()
@@ -1013,7 +1019,8 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 
 		mesh = obj.data
 		verts = mesh.vertices
-		print ( "Mesh has " + str(len(verts)) + " verts" )
+		if self.verbose:
+			print ( "Mesh has " + str(len(verts)) + " verts" )
 
 		index_number_layer = mesh.vertex_layers_float['index_number']
 		parent_index_layer = mesh.vertex_layers_float['parent_index']
@@ -1049,7 +1056,8 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			#fields = [ str(int(P)), str(int(T)), str(x), str(y), str(z), str(int(n)), str(R) ]
 			fields  = [ str(int(n)), str(int(T)), str(x), str(y), str(z), str(R), str(int(P)) ]
 
-			print ( "  Fields from " + obj.name + " = " + str(fields) )
+			if self.verbose:
+				print ( "  Fields from " + obj.name + " = " + str(fields) )
 			point_dict[fields[0]] = fields
 			i += 1
 
@@ -1061,7 +1069,8 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 		# Next create the list of segments - one for each child that has a parent
 		for k in point_keys:
 			child_fields = point_dict[k]
-			print ( "  Sorted Fields from " + obj.name + " = " + str(child_fields) )
+			if self.verbose:
+				print ( "  Sorted Fields from " + obj.name + " = " + str(child_fields) )
 			if child_fields[6] in point_keys:
 				# This point has a parent, so make a segment from parent to child
 				parent_fields = point_dict[child_fields[6]]
@@ -1093,7 +1102,8 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 		# Read in the data
 		segments = []
 
-		print ( "Reading from file " + self.neuron_file_name )
+		if self.verbose:
+			print ( "Reading from file " + self.neuron_file_name )
 
 		self.num_nodes_in_file = 0
 		num_total_segments = 0
@@ -1108,16 +1118,19 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			self.num_lines_in_file = len(lines)
 			for l in lines:
 				l = l.strip()
-				print ( "Line: " + l )
+				if self.verbose:
+					print ( "Line: " + l )
 				if len(l) > 0:
 					if l[0:6] == "Branch":
-						print ( "Branch" )
+						if self.verbose:
+							print ( "Branch" )
 						if len(segment) > 0:
 							segments = segments + [ segment ]
 							segment = []
 							num_total_segments += 1
 					if l[0:4] == "Node":
-						print ( "Node" )
+						if self.verbose:
+							print ( "Node" )
 						values = l.split()[1:]
 						segment = segment + [ values ]
 						self.num_nodes_in_file += 1
@@ -1172,7 +1185,8 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			point_dict = {}
 			for l in lines:
 				l = l.strip()
-				print ( "Line: " + l )
+				if self.verbose:
+					print ( "Line: " + l )
 				if len(l) > 0:
 					if l[0] != "#":
 						fields = l.split()
@@ -1208,19 +1222,23 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			num_entries_to_read = 0
 			segment = []
 			for l in lines:
-				print ( "Line: " + l.strip() )
+				if self.verbose:
+					print ( "Line: " + l.strip() )
 				if len(l.strip()) > 0:
 					# This is a real line
 					if num_entries_to_read == 0:
 						# Look for a line containing a 1 and the number of fields
 						fields = l.strip().split()
 						if len(fields) != 2:
-							print ( "Error: expected 2 values" )
+							if self.verbose:
+								print ( "Error: expected 2 values" )
 						else:
 							if int(fields[0]) != 1:
-								print ( "Unexpected first value for line" + l )
+								if self.verbose:
+									print ( "Unexpected first value for line" + l )
 							num_entries_to_read = int(fields[1])
-							print ( "Read " + str(num_entries_to_read) )
+							if self.verbose:
+								print ( "Read " + str(num_entries_to_read) )
 							if len(segment) > 0:
 								segments = segments + [ segment ]
 								segment = []
@@ -1252,12 +1270,16 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 	def perform_analysis ( self, segments ):
 
 		# Dump to compare:
-		#print ( "========== DUMP OF SEGMENTS ==========" )
+		#if self.verbose:
+		# print ( "========== DUMP OF SEGMENTS ==========" )
 		#for seg in segments:
-		#  print ( "Segment:" )
+		#  if self.verbose:
+		# print ( "Segment:" )
 		#  for node in seg:
-		#    print ( "  Node: " + str(node) )
-		#print ( "======================================" )
+		#    if self.verbose:
+		# print ( "  Node: " + str(node) )
+		#if self.verbose:
+		# print ( "======================================" )
 
 		# Find the smallest radius
 
@@ -1268,7 +1290,8 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 		self.smallest_radius_in_file = -1
 		self.min_x = self.max_x = self.min_y = self.max_y = self.min_z = self.max_z = -1
 		for seg in segments:
-			print ( "=== Finding bounds and smallest radius for segment " + str(seg_num) + " ===" )
+			if self.verbose:
+				print ( "=== Finding bounds and smallest radius for segment " + str(seg_num) + " ===" )
 			seg_num += 1
 			lc = None
 			cap1 = True
@@ -1295,11 +1318,16 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 					self.max_z = z
 				first_pass = False
 
-		print ( "X range: %g to %g" % (self.min_x, self.max_x) )
-		print ( "Y range: %g to %g" % (self.min_y, self.max_y) )
-		print ( "Z range: %g to %g" % (self.min_z, self.max_z) )
-		print ( "Largest radius = " + str(self.largest_radius_in_file) )
-		print ( "Smallest radius = " + str(self.smallest_radius_in_file) )
+		if self.verbose:
+			print ( "X range: %g to %g" % (self.min_x, self.max_x) )
+		if self.verbose:
+			print ( "Y range: %g to %g" % (self.min_y, self.max_y) )
+		if self.verbose:
+			print ( "Z range: %g to %g" % (self.min_z, self.max_z) )
+		if self.verbose:
+			print ( "Largest radius = " + str(self.largest_radius_in_file) )
+		if self.verbose:
+			print ( "Smallest radius = " + str(self.smallest_radius_in_file) )
 
 		self.file_analyzed = True
 
@@ -1376,7 +1404,8 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			point_num = 0
 			for l in file_lines:
 				l = l.strip()
-				print ( "Line: " + l )
+				if self.verbose:
+					print ( "Line: " + l )
 				if len(l) > 0:
 					if l[0] != "#":
 						fields = l.split() + [ str(point_num) ]
@@ -1388,31 +1417,36 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 
 			# Build the Blender mesh starting with the vertices
 
-			print ( "Making the verts:" )
+			if self.verbose:
+				print ( "Making the verts:" )
 
 			verts = []
 			for k in point_keys:
 				p = point_dict[k]
-				print ( str(p) )
+				if self.verbose:
+					print ( str(p) )
 				px = float(p[2])
 				py = float(p[3])
 				pz = float(p[4])
 				pr = float(p[5])
 				verts.append ( [ px, py, pz ] )
 
-			print ( "Making the lines:" )
+			if self.verbose:
+				print ( "Making the lines:" )
 
 			lines = []
 			for k in point_keys:
 				p = point_dict[k]
-				print ( str(p) )
+				if self.verbose:
+					print ( str(p) )
 				ppkey = p[6]
 				if int(ppkey) >= 0:
 					# This point has a parent, so make a line segment
 					pp = point_dict[ppkey]
 					lines.append ( [ int(pp[7]), int(p[7]) ] )
 
-			print ( "Making the mesh:" )
+			if self.verbose:
+				print ( "Making the mesh:" )
 
 			new_mesh = bpy.data.meshes.new ( swc_fname + "_mesh" )
 			new_mesh.from_pydata ( verts, lines, [] )
@@ -1424,12 +1458,15 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			# All points
 			point_list = list(point_dict.values())
 			point_co_list = [mathutils.Vector([float(p[2]),float(p[3]),float(p[4])]) for p in point_list]
-			print("------")
-			print(point_co_list)
+			if self.verbose:
+				print("------")
+			if self.verbose:
+				print(point_co_list)
 			# Go through all vertices
 			for v in new_obj.data.vertices:
 				# Get this vertex the point list
-				print("Checking: " + str(v.co))
+				if self.verbose:
+					print("Checking: " + str(v.co))
 				for vo in point_co_list:
 					if (v.co-vo).length < 0.001:
 						# Get the index
@@ -1437,7 +1474,8 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 						# Set it's bevel weight
 						v.bevel_weight = float(point_list[idx][5])
 			'''
-			print ( "Adding the metadata to each vertex:" )
+			if self.verbose:
+				print ( "Adding the metadata to each vertex:" )
 
 			#  n T x y z R P
 
@@ -1451,7 +1489,8 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 			vert_index = 0
 			for k in point_keys:
 				p = point_dict[k]
-				print ( "Adding metadata from " + str(p) )
+				if self.verbose:
+					print ( "Adding metadata from " + str(p) )
 				index_number_layer.data[vert_index].value = int(p[0])
 				parent_index_layer.data[vert_index].value = int(p[6])
 				segment_type_layer.data[vert_index].value = int(p[1])
@@ -1493,13 +1532,15 @@ class MNM_PT_MakeNeuronMetaPropGroup(bpy.types.PropertyGroup):
 		seg_num = 1
 		obj_name = None
 		for seg in segments:
-			print ( "=== Building Branch " + str(seg_num) + " ===" )
+			if self.verbose:
+				print ( "=== Building Branch " + str(seg_num) + " ===" )
 			seg_num += 1
 			lc = None
 			for c in seg:
 				if (lc != None):  # and (seg_num < 20):
 
-					print ( "Building segment with radius of " + str(lc[3]) + " and " + str(c[3]) )
+					if self.verbose:
+						print ( "Building segment with radius of " + str(lc[3]) + " and " + str(c[3]) )
 
 					x1 = float(lc[0]) * self.scale_file_data
 					y1 = float(lc[1]) * self.scale_file_data
@@ -1605,5 +1646,5 @@ def unregister():
 
 
 if __name__ == "__main__":
-  print ("Registering")
-  register()
+	print ("Registering")
+	register()
